@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e31b915f4731d42ed84398682f1a0004, type: 3}
+  m_Name: Johny
+  m_EditorClassIdentifier: 
+  Name: Johny
+  Description: "Johny is a male Cannibalistic Warlord, Blood-Fueled. Johny wears
+    necklaces of human teeth, demanding \"flesh tributes\" from families for \"protection.\"
+    Boils Sophia\u2019s pet dog into stew and force-feeds it to her. Declares war
+    on Alice\u2019s cult, crucifying her followers on the market square. Secretly
+    sells lower-class orphans to Lucas as factory slaves."

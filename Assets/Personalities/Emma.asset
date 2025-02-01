@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e31b915f4731d42ed84398682f1a0004, type: 3}
+  m_Name: Emma
+  m_EditorClassIdentifier: 
+  Name: Emma
+  Description: "Emma is a female Sociopathic Puppeteer, Identity Thief. Emma forges
+    Sebastian\u2019s handwriting to spread manifestos urging lower-class suicide
+    \"to spite the elites.\" She swaps Noah\u2019s stolen food with hallucinogens,
+    framing Sophia for his psychotic rampages. Seduces Johny to extract gang secrets,
+    then leaks them to Liam\u2019s guards, sparking mass executions."

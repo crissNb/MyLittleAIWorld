@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e31b915f4731d42ed84398682f1a0004, type: 3}
+  m_Name: Lucas
+  m_EditorClassIdentifier: 
+  Name: Lucas
+  Description: Lucas is a male Monopolist Cartel King, Profiteering Parasite. Dresses
+    in gold thread spun by child laborers. Sells tainted medicine as "miracles,"
+    charging families their last coins. Bribes Johny to assassinate competitors.
+    Hoards grain until famine strikes, then trades 1kg of rice for a firstborn child.
+    Victoria blackmails him with ledgers, so he hires Alice to "silence her."

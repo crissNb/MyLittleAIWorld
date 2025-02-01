@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e31b915f4731d42ed84398682f1a0004, type: 3}
+  m_Name: Isabell
+  m_EditorClassIdentifier: 
+  Name: Isabell
+  Description: "Isabell is a female Class Traitor, Vengeful Nouveau Riche. Buys Sophia\u2019s
+    siblings as indentured servants, forcing them to call her \"Your Grace.\" Pays
+    Emma to spread syphilis in Lucas\u2019 brothels. Hosts \"charity balls\" where
+    middle-class guests pelt lower-class \"volunteers\" with rotten fruit. Burns
+    her own factory for insurance, blaming Alice\u2019s cult."

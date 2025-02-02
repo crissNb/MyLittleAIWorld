@@ -11,4 +11,22 @@ public class BasePrompt : ScriptableObject
 
     [TextArea]
     public string CurrentRelationshipText;
+
+    [TextArea]
+    public string PreviousOpponentText;
+
+    [TextArea]
+    public string PreviousActionOpponent;
+
+    [TextArea]
+    public string PreviousActionText;
+
+    [TextArea]
+    public string LocationText;
+
+    [TextArea]
+    public string ActionText;
+
+    [TextArea]
+    public string RespondInstructions;
 }

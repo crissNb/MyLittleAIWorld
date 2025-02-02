@@ -4,6 +4,7 @@ using UnityEngine;
 public class Personality : ScriptableObject
 {
     public string Name;
+
     [TextArea]
     public string Description;
 }

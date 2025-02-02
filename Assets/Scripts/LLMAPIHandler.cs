@@ -51,7 +51,7 @@ public class LLMAPIHandler : MonoBehaviour
     private class ChatResponse
     {
         public List<Choice> choices;
-        
+
         [System.Serializable]
         public class Choice
         {
@@ -60,31 +60,37 @@ public class LLMAPIHandler : MonoBehaviour
     }
 
     [Header("API Configuration")]
-    [SerializeField] private string apiUrl = "http://localhost:1337/v1/chat/completions";
-    [SerializeField] private ChatModel defaultModel = ChatModel.GPT4o;
-    [SerializeField] private string[] providers = { "AIChatFree", "AutonomousAI" };
+    [SerializeField]
+    private string apiUrl = "http://localhost:1337/v1/chat/completions";
 
-    public void SendChatRequest(string userMessage, System.Action<string> callback)
+    [SerializeField]
+    private ChatModel defaultModel = ChatModel.GPT4o;
+
+    [SerializeField]
+    private string[] providers = { "AIChatFree", "AutonomousAI" };
+
+    public void SendChatRequest(
+        string userMessage,
+        System.Action<string> callback,
+        System.Action<string> errorCallback = null
+    )
     {
-        StartCoroutine(SendRequestCoroutine(userMessage, defaultModel, callback));
+        StartCoroutine(SendRequestCoroutine(userMessage, defaultModel, callback, errorCallback));
     }
 
-    public void SendChatRequest(string userMessage, ChatModel model, System.Action<string> callback)
-    {
-        StartCoroutine(SendRequestCoroutine(userMessage, model, callback));
-    }
-
-    private IEnumerator SendRequestCoroutine(string userMessage, ChatModel model, System.Action<string> callback)
+    private IEnumerator SendRequestCoroutine(
+        string userMessage,
+        ChatModel model,
+        System.Action<string> callback,
+        System.Action<string> errorCallback = null
+    )
     {
         string providers = string.Join(" ", this.providers);
 
         // Create request data
         var requestData = new ChatRequest
         {
-            messages = new List<Message>
-            {
-                new Message("user", userMessage)
-            },
+            messages = new List<Message> { new Message("user", userMessage) },
             model = ModelToString(model),
             provider = providers
         };
@@ -104,7 +110,7 @@ public class LLMAPIHandler : MonoBehaviour
 
         if (request.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogError($"Error: {request.error}");
+            errorCallback?.Invoke(request.error);
             yield break;
         }
 
@@ -116,7 +122,7 @@ public class LLMAPIHandler : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Failed to parse response");
+            errorCallback?.Invoke("Failed to parse response");
         }
     }
 

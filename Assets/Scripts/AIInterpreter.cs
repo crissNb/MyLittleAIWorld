@@ -1,10 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 public class AIInterpreter : MonoBehaviour
 {
     [SerializeField]
     private bool _debugMode;
+
     [SerializeField]
     private AIController _aiController;
 
@@ -84,7 +86,16 @@ public class AIInterpreter : MonoBehaviour
             {
                 response = response[7..];
                 response = response[..^3];
-                DebugPrint(response);
+                Debug.Log(response);
+            }
+
+            // Add missing quotes around JSON keys
+            string[] jsonKeys = { "action", "target", "content" };
+            foreach (string key in jsonKeys)
+            {
+                string pattern = $@"([{{,]\s*){key}(\s*:)";
+                string replacement = $"$1\"{key}\"$2";
+                response = Regex.Replace(response, pattern, replacement);
             }
 
             LLMAction action = JsonUtility.FromJson<LLMAction>(response);

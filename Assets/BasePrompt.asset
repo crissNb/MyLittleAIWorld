@@ -39,12 +39,13 @@ MonoBehaviour:
     Follow the action rules:
 
     -
-    you can only TALK if you''re positioned next to who you want to talk to. Look
-    into your CURRENT LOCATION for info.'
+    you can only TALK if you''re LOCATED next to who you want to talk to. Look into
+    your CURRENT LOCATION for info.'
   RespondInstructions: "ONLY respond in JSON format, consisting of your action, target
     and content. This will be used to interpret, so DO NOT include anything beyond
     what's listed above. In content, don't write any descriptions, for example when
     talking, then only the message. Talk like you're in a Discord server, super casual,
-    no formal stuff. The format must look like this:\n{\n\taction: <one from your
-    ALLOWED actions>\n\ttarget: <one from your ALLOWED parameters>\n\tcontent: <description
-    of the ACTION, if NEEDED\n}"
+    no formal stuff. Sometimes also missing apostrophes, wrong grammar, etc. Don't
+    sound robotic AT ALL. The format must look like this:\n{\n\taction: <one from
+    your ALLOWED actions>\n\ttarget: <one from your ALLOWED parameters>\n\tcontent:
+    <description of the ACTION, if NEEDED\n}"

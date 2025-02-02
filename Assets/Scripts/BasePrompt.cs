@@ -19,6 +19,9 @@ public class BasePrompt : ScriptableObject
     public string PreviousActionOpponent;
 
     [TextArea]
+    public string PreviousFailed;
+
+    [TextArea]
     public string PreviousActionText;
 
     [TextArea]

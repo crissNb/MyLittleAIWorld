@@ -52,11 +52,18 @@ public class AIInterpreter : MonoBehaviour
         LLMAPIHandler.Instance.SendChatRequest(prompt, InterpretResponseCallback, ErrorCallback);
     }
 
+    public void SendRequest(string failReason)
+    {
+        string prompt = BuildPrompt(failReason);
+        Debug.Log("Sending request: " + prompt);
+        LLMAPIHandler.Instance.SendChatRequest(prompt, InterpretResponseCallback, ErrorCallback);
+    }
+
     private void ErrorCallback(string error = "")
     {
         Debug.LogError("Error: " + error);
         // Retry
-        SendRequest();
+        SendRequest(error);
     }
 
     public void SetOpponentAction(OpponentAction opponentAction)
@@ -73,11 +80,13 @@ public class AIInterpreter : MonoBehaviour
             // If response contains ```json at the start, remove it and also remove the closing ```
             if (response.StartsWith("```json"))
             {
-                response = response[6..];
+                response = response[7..];
                 response = response[..^3];
+                Debug.Log(response);
             }
 
             LLMAction action = JsonUtility.FromJson<LLMAction>(response);
+            _previousAction = action;
 
             Debug.Log("Interpreted action: " + action.action);
 
@@ -89,22 +98,20 @@ public class AIInterpreter : MonoBehaviour
                 case "talk":
                     if (!_aiController.Talk(param, content))
                     {
-                        //ErrorCallback("Cannot talk to: " + param);
+                        ErrorCallback("Cannot talk to: " + param);
                     }
                     break;
                 case "goto":
                     if (!_aiController.GoTo(param))
                     {
-                        //ErrorCallback("Location not found: " + param);
+                        ErrorCallback("Location not found: " + param);
                     }
                     break;
                 default:
                     // Invalid action, request new action
-                    //ErrorCallback("Invalid action: " + action.action);
+                    ErrorCallback("Invalid action: " + action.action);
                     break;
             }
-
-            _previousAction = action;
         }
         catch (System.Exception e)
         {
@@ -113,7 +120,7 @@ public class AIInterpreter : MonoBehaviour
         }
     }
 
-    private string BuildPrompt()
+    private string BuildPrompt(string failReason = "")
     {
         string prompt =
             _basePrompt.Intro
@@ -135,6 +142,11 @@ public class AIInterpreter : MonoBehaviour
                 + _basePrompt.PreviousActionOpponent
                 + "\n"
                 + _previousOpponentAction.actionDescription;
+        }
+
+        if (!string.IsNullOrEmpty(failReason))
+        {
+            prompt += _basePrompt.PreviousFailed + failReason + "\n";
         }
 
         string previousActionJSON = JsonUtility.ToJson(_previousAction);

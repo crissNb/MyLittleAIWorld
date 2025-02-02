@@ -118,4 +118,11 @@ public class AIController : MonoBehaviour
     {
         return _residence;
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log(GetPersonality().Name + " is entering: " + other.name);
+
+        _aiInterpreter.SetLocation(other.name);
+    }
 }

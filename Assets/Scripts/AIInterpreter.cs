@@ -23,6 +23,7 @@ public class AIInterpreter : MonoBehaviour
     private Dictionary<string, string> _relationships;
 
     private string _currentLocation;
+    private string _previousFailReason;
 
     public Personality Personality
     {
@@ -63,9 +64,15 @@ public class AIInterpreter : MonoBehaviour
         LLMAPIHandler.Instance.SendChatRequest(prompt, InterpretResponseCallback, ErrorCallback);
     }
 
+    public void RetryRequest()
+    {
+        SendRequest(_previousFailReason);
+    }
+
     private void ErrorCallback(string error = "")
     {
         Debug.LogError("Error: " + error);
+        _previousFailReason = error;
         // Retry
         SendRequest(error);
     }
@@ -86,7 +93,6 @@ public class AIInterpreter : MonoBehaviour
             {
                 response = response[7..];
                 response = response[..^3];
-                Debug.Log(response);
             }
 
             // Add missing quotes around JSON keys
@@ -106,29 +112,25 @@ public class AIInterpreter : MonoBehaviour
             string param = action.target;
             string content = action.content;
             string result = "";
-            switch (action.action.ToLower())
+            result = action.action.ToLower() switch
             {
-                case "talk":
-                    result = _aiController.Talk(param, content);
-                    break;
-                case "goto":
-                    result = _aiController.GoTo(param);
-                    break;
-                default:
-                    // Invalid action, request new action
-                    ErrorCallback("Invalid action: " + action.action);
-                    break;
-            }
-
+                "talk" => _aiController.Talk(param, content),
+                "goto" => _aiController.GoTo(param),
+                _ => "Invalid action: " + action.action, // Invalid action, request new action
+            };
             if (!string.IsNullOrEmpty(result))
             {
                 ErrorCallback(result);
+            }
+            else
+            {
+                _previousFailReason = "";
             }
         }
         catch (System.Exception e)
         {
             Debug.LogError("Error interpreting response: " + e.Message);
-            SendRequest();
+            RetryRequest();
         }
     }
 

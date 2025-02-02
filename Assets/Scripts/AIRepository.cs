@@ -20,6 +20,12 @@ public class AIRepository : MonoBehaviour
     [SerializeField]
     private AIController[] _aiControllers;
 
+    [SerializeField]
+    private float _actionInterval;
+
+    [SerializeField]
+    private float _talkDistance;
+
     private readonly List<Personality> _personalities = new();
     private readonly List<Transform> _residences = new();
 
@@ -29,7 +35,21 @@ public class AIRepository : MonoBehaviour
         {
             _personalities.Add(aiController.GetPersonality());
             _residences.Add(aiController.GetResidence());
+            aiController.StartAI(Random.Range(0, _actionInterval), _actionInterval, _talkDistance);
         }
+    }
+
+    public AIController GetAIController(string name)
+    {
+        foreach (AIController aiController in _aiControllers)
+        {
+            if (aiController.GetPersonality().Name == name)
+            {
+                return aiController;
+            }
+        }
+
+        return null;
     }
 
     public Personality GetPersonality(string name)

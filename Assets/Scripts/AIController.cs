@@ -1,10 +1,9 @@
 using UnityEngine;
-using UnityEngine.AI;
 
 public class AIController : MonoBehaviour
 {
     [SerializeField]
-    private NavMeshAgent _navMeshAgent;
+    private NPCController _npcController;
 
     [SerializeField]
     private AIInterpreter _aiInterpreter;
@@ -14,26 +13,34 @@ public class AIController : MonoBehaviour
 
     private float _actionTimer;
     private float _actionInterval;
+    private float _talkDistance;
 
     private AIState _aiState;
 
     private enum AIState
     {
         Idle,
-        Busy
+        Walking,
+        Talking
     }
 
-    public void StartAI(float actionOffset, float actionInterval)
+    public void StartAI(float actionOffset, float actionInterval, float talkDistance)
     {
         _actionTimer = actionOffset;
         _actionInterval = actionInterval;
         _aiState = AIState.Idle;
+        _talkDistance = talkDistance;
+        _aiInterpreter.SetLocation(_residence.name);
     }
 
     private void Update()
     {
-        if (_aiState == AIState.Busy)
+        if (_aiState == AIState.Walking)
         {
+            if (!_npcController.IsMoving())
+            {
+                _aiState = AIState.Idle;
+            }
             return;
         }
 
@@ -41,29 +48,61 @@ public class AIController : MonoBehaviour
 
         if (_actionTimer <= 0)
         {
+            Debug.Log("AI action timer expired");
             _aiInterpreter.SendRequest();
-            _aiState = AIState.Busy;
+            _aiState = AIState.Walking;
             _actionTimer = _actionInterval;
         }
     }
 
-    public void GoTo(string place)
+    public bool GoTo(string place)
     {
         // Look for residence
         Transform residence = AIRepository.Instance.FindResidence(place);
 
         if (residence != null)
         {
-            _navMeshAgent.SetDestination(residence.position);
-            return;
+            _npcController.Move(residence.position);
+            _aiState = AIState.Walking;
+            return true;
         }
 
         // Look for other locations
+
+        return false;
     }
 
-    public void Talk(string targetPerson, string message)
+    public bool Talk(string targetPerson, string message)
     {
+        AIController targetAI = AIRepository.Instance.GetAIController(targetPerson);
 
+        if (targetAI == null)
+        {
+            Debug.LogError("AIController not found for " + targetPerson);
+            return false;
+        }
+
+        // Check if target is within talking distance
+        if (Vector3.Distance(transform.position, targetAI.transform.position) > _talkDistance)
+        {
+            Debug.LogError("Target " + targetPerson + " is too far away");
+            return false;
+        }
+
+        // Talk to target
+        targetAI.ReceiveTalk(GetPersonality().Name, message);
+
+        _aiState = AIState.Talking;
+
+        return true;
+    }
+
+    public void ReceiveTalk(string from, string message)
+    {
+        // Handle incoming message
+        _aiState = AIState.Talking;
+        _aiInterpreter.SetOpponentAction(new OpponentAction(from, message));
+        _aiInterpreter.SendRequest();
     }
 
     public Personality GetPersonality()

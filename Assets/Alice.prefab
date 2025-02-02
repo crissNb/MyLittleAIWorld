@@ -390,6 +390,9 @@ GameObject:
   - component: {fileID: 359394700319411203}
   - component: {fileID: 290000726689988684}
   - component: {fileID: 3128547629132761059}
+  - component: {fileID: 4116510370116892837}
+  - component: {fileID: 7941366402655041665}
+  - component: {fileID: 4225759917761916896}
   m_Layer: 0
   m_Name: Alice
   m_TagString: Untagged
@@ -427,6 +430,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 235db280f02ac4ca2a379e992342155a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _npcController: {fileID: 7941366402655041665}
+  _aiInterpreter: {fileID: 3128547629132761059}
+  _residence: {fileID: 0}
 --- !u!114 &3128547629132761059
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -439,8 +445,71 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe97e2a3201841a3afd49d40a63d5e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _aiController: {fileID: 290000726689988684}
   _personality: {fileID: 11400000, guid: 380c491335f254b4c9be2b8fee1835a8, type: 2}
   _basePrompt: {fileID: 11400000, guid: 2295dd951d08a421b962023b59b37c48, type: 2}
+--- !u!195 &4116510370116892837
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8445072381114682471}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.27
+  m_Speed: 1.5
+  m_Acceleration: 720
+  avoidancePriority: 50
+  m_AngularSpeed: 5000
+  m_StoppingDistance: 0.07
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 0.75
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &7941366402655041665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8445072381114682471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8222dcb3b378c4aafac0af1c921637c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _agent: {fileID: 4116510370116892837}
+  _animator: {fileID: 4225759917761916896}
+  _velocityParameter: Velocity
+  _moveSpeed: 1.5
+  _acceleration: 720
+  _rotationSmoothTime: 0.1
+--- !u!95 &4225759917761916896
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8445072381114682471}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 91cbc8352d30d4be5ac1ee5e059fd635, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &9199816432091421696
 GameObject:
   m_ObjectHideFlags: 0

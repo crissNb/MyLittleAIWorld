@@ -23,7 +23,8 @@ public class LLMAPIHandler : MonoBehaviour
     public enum ChatModel
     {
         GPT4o,
-        Claude3_5Sonnet
+        Claude3_5Sonnet,
+        GPT4oMini
     }
 
     [System.Serializable]
@@ -69,6 +70,9 @@ public class LLMAPIHandler : MonoBehaviour
     [SerializeField]
     private string[] providers = { "AIChatFree", "AutonomousAI" };
 
+    [SerializeField]
+    private bool useCustomProviders = false;
+
     public void SendChatRequest(
         string userMessage,
         System.Action<string> callback,
@@ -91,9 +95,14 @@ public class LLMAPIHandler : MonoBehaviour
         var requestData = new ChatRequest
         {
             messages = new List<Message> { new Message("user", userMessage) },
-            model = ModelToString(model),
-            provider = providers
+            model = ModelToString(model)
         };
+
+        // Only set provider if useCustomProviders is true
+        if (useCustomProviders)
+        {
+            requestData.provider = providers;
+        }
 
         // Convert to JSON
         string jsonData = JsonUtility.ToJson(requestData);
@@ -132,6 +141,7 @@ public class LLMAPIHandler : MonoBehaviour
         {
             ChatModel.GPT4o => "gpt-4o",
             ChatModel.Claude3_5Sonnet => "claude-3.5-sonnet",
+            ChatModel.GPT4oMini => "gpt-4o-mini",
             _ => "gpt-4o" // default
         };
     }

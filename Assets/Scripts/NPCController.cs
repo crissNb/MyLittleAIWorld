@@ -3,16 +3,25 @@ using UnityEngine.AI;
 
 public class NPCController : MonoBehaviour
 {
-    [SerializeField] private NavMeshAgent _agent;
-    [SerializeField] private Animator _animator;
-    [Header("Animation Settings")]
-    [SerializeField] private string _velocityParameter = "Speed";
+    [SerializeField]
+    private NavMeshAgent _agent;
 
+    [SerializeField]
+    private Animator _animator;
+
+    [Header("Animation Settings")]
+    [SerializeField]
+    private string _velocityParameter = "Speed";
 
     [Header("Movement Settings")]
-    [SerializeField] private float _moveSpeed = 1.5f;
-    [SerializeField] private float _acceleration = 15f;
-    [SerializeField] private float _rotationSmoothTime = 0.1f;
+    [SerializeField]
+    private float _moveSpeed = 1.5f;
+
+    [SerializeField]
+    private float _acceleration = 15f;
+
+    [SerializeField]
+    private float _rotationSmoothTime = 0.1f;
 
     private Quaternion _targetRotation;
 
@@ -60,7 +69,7 @@ public class NPCController : MonoBehaviour
     private void UpdateRotationDirection()
     {
         // Only update rotation when moving
-        if (_agent.pathPending || _agent.remainingDistance <= _agent.stoppingDistance) 
+        if (_agent.pathPending || _agent.remainingDistance <= _agent.stoppingDistance)
             return;
 
         // Get the next path corner the agent is moving toward
@@ -77,5 +86,10 @@ public class NPCController : MonoBehaviour
     public void Move(Vector3 destination)
     {
         _agent.SetDestination(destination);
+    }
+
+    public bool IsMoving()
+    {
+        return _agent.remainingDistance > _agent.stoppingDistance;
     }
 }

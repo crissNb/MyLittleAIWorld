@@ -27,7 +27,7 @@ MonoBehaviour:
   PreviousOpponentText: 'You are currently interacting with '
   PreviousActionOpponent: 'and they have done the following action:'
   PreviousActionText: 'Your previous action was the following:'
-  LocationText: 'Your current location is:'
+  LocationText: 'Your CURRENT LOCATION is:'
   ActionText: 'You can perform following actions:
 
     Talk [PERSON_NAME], GoTo [PLACE_NAME]
@@ -39,9 +39,12 @@ MonoBehaviour:
     Follow the action rules:
 
     -
-    you can only TALK if you''re positioned next to who you want to talk to.'
+    you can only TALK if you''re positioned next to who you want to talk to. Look
+    into your CURRENT LOCATION for info.'
   RespondInstructions: "ONLY respond in JSON format, consisting of your action, target
     and content. This will be used to interpret, so DO NOT include anything beyond
-    what's listed above. The format must look like this:\n{\n\taction: <one from
-    your ALLOWED actions>\n\ttarget: <one from your ALLOWED parameters>\n\tcontent:
-    <description of the ACTION, if NEEDED\n}"
+    what's listed above. In content, don't write any descriptions, for example when
+    talking, then only the message. Talk like you're in a Discord server, super casual,
+    no formal stuff. The format must look like this:\n{\n\taction: <one from your
+    ALLOWED actions>\n\ttarget: <one from your ALLOWED parameters>\n\tcontent: <description
+    of the ACTION, if NEEDED\n}"

@@ -14,7 +14,7 @@ public class AIInterpreter : MonoBehaviour
 
     private LLMAction _previousAction;
 
-    private OpponentLLMAction _previousOpponentAction;
+    private OpponentAction _previousOpponentAction;
 
     private Dictionary<string, string> _relationships;
 
@@ -23,13 +23,6 @@ public class AIInterpreter : MonoBehaviour
     public Personality Personality
     {
         get { return _personality; }
-    }
-
-    [System.Serializable]
-    private class OpponentLLMAction
-    {
-        public string name;
-        public LLMAction action;
     }
 
     [System.Serializable]
@@ -55,14 +48,20 @@ public class AIInterpreter : MonoBehaviour
     public void SendRequest()
     {
         string prompt = BuildPrompt();
+        Debug.Log("Sending request: " + prompt);
         LLMAPIHandler.Instance.SendChatRequest(prompt, InterpretResponseCallback, ErrorCallback);
     }
 
-    private void ErrorCallback(string error)
+    private void ErrorCallback(string error = "")
     {
         Debug.LogError("Error: " + error);
         // Retry
         SendRequest();
+    }
+
+    public void SetOpponentAction(OpponentAction opponentAction)
+    {
+        _previousOpponentAction = opponentAction;
     }
 
     private void InterpretResponseCallback(string response)
@@ -71,6 +70,13 @@ public class AIInterpreter : MonoBehaviour
 
         try
         {
+            // If response contains ```json at the start, remove it and also remove the closing ```
+            if (response.StartsWith("```json"))
+            {
+                response = response[6..];
+                response = response[..^3];
+            }
+
             LLMAction action = JsonUtility.FromJson<LLMAction>(response);
 
             Debug.Log("Interpreted action: " + action.action);
@@ -81,14 +87,20 @@ public class AIInterpreter : MonoBehaviour
             switch (action.action.ToLower())
             {
                 case "talk":
-                    _aiController.Talk(param, content);
+                    if (!_aiController.Talk(param, content))
+                    {
+                        //ErrorCallback("Cannot talk to: " + param);
+                    }
                     break;
                 case "goto":
-                    _aiController.GoTo(param);
+                    if (!_aiController.GoTo(param))
+                    {
+                        //ErrorCallback("Location not found: " + param);
+                    }
                     break;
                 default:
                     // Invalid action, request new action
-                    SendRequest();
+                    //ErrorCallback("Invalid action: " + action.action);
                     break;
             }
 
@@ -106,6 +118,7 @@ public class AIInterpreter : MonoBehaviour
         string prompt =
             _basePrompt.Intro
             + _personality.Name
+            + ". "
             + _personality.Description
             + "\n"
             + _basePrompt.AfterDesc
@@ -116,13 +129,12 @@ public class AIInterpreter : MonoBehaviour
 
         if (_previousOpponentAction != null)
         {
-            string previousOpponentActionJSON = JsonUtility.ToJson(_previousOpponentAction);
             prompt +=
                 _basePrompt.PreviousOpponentText
-                + _previousOpponentAction.name
+                + _previousOpponentAction.from
                 + _basePrompt.PreviousActionOpponent
                 + "\n"
-                + previousOpponentActionJSON;
+                + _previousOpponentAction.actionDescription;
         }
 
         string previousActionJSON = JsonUtility.ToJson(_previousAction);
@@ -167,5 +179,18 @@ public class AIInterpreter : MonoBehaviour
     {
         _currentLocation = location;
         return _currentLocation;
+    }
+}
+
+[System.Serializable]
+public class OpponentAction
+{
+    public string from;
+    public string actionDescription;
+
+    public OpponentAction(string from, string actionDescription)
+    {
+        this.from = from;
+        this.actionDescription = actionDescription;
     }
 }

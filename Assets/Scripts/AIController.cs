@@ -20,6 +20,7 @@ public class AIController : MonoBehaviour
     private enum AIState
     {
         Idle,
+        AwaitResponse,
         Walking,
         Talking
     }
@@ -35,6 +36,11 @@ public class AIController : MonoBehaviour
 
     private void Update()
     {
+        if (_aiState == AIState.AwaitResponse)
+        {
+            return;
+        }
+
         if (_aiState == AIState.Walking)
         {
             if (!_npcController.IsMoving())
@@ -50,12 +56,12 @@ public class AIController : MonoBehaviour
         {
             Debug.Log("AI action timer expired");
             _aiInterpreter.SendRequest();
-            _aiState = AIState.Walking;
+            _aiState = AIState.AwaitResponse;
             _actionTimer = _actionInterval;
         }
     }
 
-    public bool GoTo(string place)
+    public string GoTo(string place)
     {
         // Look for residence
         Transform residence = AIRepository.Instance.FindResidence(place);
@@ -64,29 +70,27 @@ public class AIController : MonoBehaviour
         {
             _npcController.Move(residence.position);
             _aiState = AIState.Walking;
-            return true;
+            return "";
         }
 
         // Look for other locations
 
-        return false;
+        return place + " not found";
     }
 
-    public bool Talk(string targetPerson, string message)
+    public string Talk(string targetPerson, string message)
     {
         AIController targetAI = AIRepository.Instance.GetAIController(targetPerson);
 
         if (targetAI == null)
         {
-            Debug.LogError("AIController not found for " + targetPerson);
-            return false;
+            return targetPerson + " not found";
         }
 
         // Check if target is within talking distance
         if (Vector3.Distance(transform.position, targetAI.transform.position) > _talkDistance)
         {
-            Debug.LogError("Target " + targetPerson + " is too far away");
-            return false;
+            return targetPerson + " is too far away";
         }
 
         // Talk to target
@@ -94,7 +98,7 @@ public class AIController : MonoBehaviour
 
         _aiState = AIState.Talking;
 
-        return true;
+        return "";
     }
 
     public void ReceiveTalk(string from, string message)

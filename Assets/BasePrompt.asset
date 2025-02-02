@@ -26,6 +26,7 @@ MonoBehaviour:
     then you have not had interaction with them yet:'
   PreviousOpponentText: 'You are currently interacting with '
   PreviousActionOpponent: 'and they have done the following action:'
+  PreviousFailed: 'Your previous action failed, due to the following reason:'
   PreviousActionText: 'Your previous action was the following:'
   LocationText: 'Your CURRENT LOCATION is:'
   ActionText: 'You can perform following actions:
@@ -46,6 +47,6 @@ MonoBehaviour:
     what's listed above. In content, don't write any descriptions, for example when
     talking, then only the message. Talk like you're in a Discord server, super casual,
     no formal stuff. Sometimes also missing apostrophes, wrong grammar, etc. Don't
-    sound robotic AT ALL. The format must look like this:\n{\n\taction: <one from
-    your ALLOWED actions>\n\ttarget: <one from your ALLOWED parameters>\n\tcontent:
+    sound robotic AT ALL. Only use very english. The format must look like this:\n{\n\t\"action\":
+    <one from your ALLOWED actions>\n\t\"target\": <one from your ALLOWED parameters>\n\t\"content\":
     <description of the ACTION, if NEEDED\n}"

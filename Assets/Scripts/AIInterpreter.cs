@@ -4,6 +4,8 @@ using System.Collections.Generic;
 public class AIInterpreter : MonoBehaviour
 {
     [SerializeField]
+    private bool _debugMode;
+    [SerializeField]
     private AIController _aiController;
 
     [SerializeField]
@@ -48,14 +50,14 @@ public class AIInterpreter : MonoBehaviour
     public void SendRequest()
     {
         string prompt = BuildPrompt();
-        Debug.Log("Sending request: " + prompt);
+        DebugPrint("Sending request: " + prompt);
         LLMAPIHandler.Instance.SendChatRequest(prompt, InterpretResponseCallback, ErrorCallback);
     }
 
     public void SendRequest(string failReason)
     {
         string prompt = BuildPrompt(failReason);
-        Debug.Log("Sending request: " + prompt);
+        DebugPrint("Sending request: " + prompt);
         LLMAPIHandler.Instance.SendChatRequest(prompt, InterpretResponseCallback, ErrorCallback);
     }
 
@@ -73,7 +75,7 @@ public class AIInterpreter : MonoBehaviour
 
     private void InterpretResponseCallback(string response)
     {
-        Debug.Log("Interpreting response: " + response);
+        DebugPrint("Interpreting response: " + response);
 
         try
         {
@@ -82,35 +84,34 @@ public class AIInterpreter : MonoBehaviour
             {
                 response = response[7..];
                 response = response[..^3];
-                Debug.Log(response);
+                DebugPrint(response);
             }
 
             LLMAction action = JsonUtility.FromJson<LLMAction>(response);
             _previousAction = action;
 
-            Debug.Log("Interpreted action: " + action.action);
+            DebugPrint("Interpreted action: " + action.action);
 
             string param = action.target;
             string content = action.content;
-
+            string result = "";
             switch (action.action.ToLower())
             {
                 case "talk":
-                    if (!_aiController.Talk(param, content))
-                    {
-                        ErrorCallback("Cannot talk to: " + param);
-                    }
+                    result = _aiController.Talk(param, content);
                     break;
                 case "goto":
-                    if (!_aiController.GoTo(param))
-                    {
-                        ErrorCallback("Location not found: " + param);
-                    }
+                    result = _aiController.GoTo(param);
                     break;
                 default:
                     // Invalid action, request new action
                     ErrorCallback("Invalid action: " + action.action);
                     break;
+            }
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                ErrorCallback(result);
             }
         }
         catch (System.Exception e)
@@ -191,6 +192,14 @@ public class AIInterpreter : MonoBehaviour
     {
         _currentLocation = location;
         return _currentLocation;
+    }
+
+    private void DebugPrint(string message)
+    {
+        if (_debugMode)
+        {
+            Debug.Log(message);
+        }
     }
 }
 

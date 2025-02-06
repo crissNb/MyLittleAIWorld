@@ -31,6 +31,12 @@ public class ChatBubbleManager : MonoBehaviour
     [SerializeField]
     private float headScreenOffset = 50f;
 
+    [SerializeField]
+    private float _positionSmoothSpeed = 10f;
+
+    [SerializeField]
+    private float _topDownThreshold = 0.5f; // When to start transitioning to top-down offset
+
     private readonly Dictionary<Transform, ChatBubble> _chatBubbles =
         new Dictionary<Transform, ChatBubble>();
 
@@ -121,19 +127,21 @@ public class ChatBubbleManager : MonoBehaviour
             if (bubble.Source == null)
                 continue;
 
-            // The bubble is normally anchored above its source.
-            Vector3 desiredWorldPos = bubble.Source.position + Vector3.up * bubble.VerticalOffset;
-            Vector3 screenPos = cam.WorldToScreenPoint(desiredWorldPos);
+            // Calculate camera angle factor (0 = side view, 1 = top-down)
+            float topDownFactor = Mathf.Clamp01(
+                (Vector3.Dot(cam.transform.forward, Vector3.down) - _topDownThreshold)
+                    / (1f - _topDownThreshold)
+            );
 
-            // If the camera is nearly top–down, adjust the screen position upward by a fixed offset
-            // so the bubble does not cover the character’s head.
-            // (We check the dot product between the camera's forward and the negative world up.)
-            if (Vector3.Dot(cam.transform.forward, -Vector3.up) > 0.5f)
-            {
-                screenPos.y += headScreenOffset;
-            }
+            // Base world position above the source
+            Vector3 baseWorldPos = bubble.Source.position + Vector3.up * bubble.VerticalOffset;
+            Vector3 screenPos = cam.WorldToScreenPoint(baseWorldPos);
 
-            // Get the size of the bubble in screen space.
+            // Calculate screen-space offset based on camera angle
+            float currentHeadOffset = headScreenOffset * topDownFactor;
+            screenPos.y += currentHeadOffset;
+
+            // Get the size of the bubble in screen space
             Vector2 screenSize = bubble.GetScreenSize();
             float depth = screenPos.z;
             bubbleInfos.Add(new ChatBubbleInfo(bubble, screenPos, screenSize, depth));
@@ -165,10 +173,21 @@ public class ChatBubbleManager : MonoBehaviour
         // and update the bubbles.
         foreach (ChatBubbleInfo info in bubbleInfos)
         {
-            Vector3 adjustedWorldPos = cam.ScreenToWorldPoint(
+            Vector3 targetWorldPos = cam.ScreenToWorldPoint(
                 new Vector3(info.ScreenPos.x, info.ScreenPos.y, info.Depth)
             );
-            info.Bubble.SetWorldPosition(adjustedWorldPos);
+
+            // Get current position or use target position if bubble was just created
+            Vector3 currentPos = info.Bubble.transform.position;
+
+            // Smoothly interpolate to the target position
+            Vector3 newPos = Vector3.Lerp(
+                currentPos,
+                targetWorldPos,
+                Time.deltaTime * _positionSmoothSpeed
+            );
+
+            info.Bubble.SetWorldPosition(newPos);
             info.Bubble.FaceCamera();
         }
     }

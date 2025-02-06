@@ -40,8 +40,6 @@ public class ChatBubble : MonoBehaviour
             _bubbleRenderer = GetComponent<SpriteRenderer>();
         if (_handleRenderer == null && _handle != null)
             _handleRenderer = _handle.GetComponent<SpriteRenderer>();
-
-        // (If your bubble prefab already has proper pivot settings, you might not need additional adjustments.)
     }
 
     /// <summary>
@@ -62,7 +60,7 @@ public class ChatBubble : MonoBehaviour
             return;
 
         UpdateHandlePosition();
-        // Note: The ChatBubbleManager now handles positioning and facing.
+        // The ChatBubbleManager now handles positioning and facing.
     }
 
     /// <summary>
@@ -92,19 +90,16 @@ public class ChatBubble : MonoBehaviour
 
     /// <summary>
     /// Makes the bubble face the camera (billboarding).
+    /// Now we use a screen–aligned billboard approach so the bubble always faces the camera.
     /// </summary>
     public void FaceCamera()
     {
         Camera cam = Camera.main;
-        // Rotate so that the forward vector points from the camera toward the bubble.
-        // (Alternatively, you can use a LookAt if you wish to preserve an upright orientation.)
-        Vector3 direction = transform.position - cam.transform.position;
-        if (direction.sqrMagnitude > 0.001f)
-        {
-            // Keep the bubble upright by zeroing out any rotation around the z–axis.
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Euler(0f, targetRotation.eulerAngles.y, 0f);
-        }
+        // Use the camera's forward and up directions to create a billboard that is fully aligned with the screen.
+        transform.LookAt(
+            transform.position + cam.transform.rotation * Vector3.forward,
+            cam.transform.rotation * Vector3.up
+        );
     }
 
     /// <summary>
@@ -158,7 +153,6 @@ public class ChatBubble : MonoBehaviour
         _handle.localPosition = edgePoint;
 
         // Set the handle’s rotation so that it “points” back to the target.
-        // (Here we pick one of two fixed angles based on whether the pointer is more horizontal or vertical.)
         bool isHorizontal = Mathf.Abs(direction.x) > Mathf.Abs(direction.y);
         float clampedAngle = 0f;
         if (isHorizontal)

@@ -27,6 +27,10 @@ public class ChatBubbleManager : MonoBehaviour
     [SerializeField]
     private Transform testTransform2;
 
+    // The extra vertical offset (in pixels) for chat bubbles in top–down view
+    [SerializeField]
+    private float headScreenOffset = 50f;
+
     private readonly Dictionary<Transform, ChatBubble> _chatBubbles =
         new Dictionary<Transform, ChatBubble>();
 
@@ -110,16 +114,25 @@ public class ChatBubbleManager : MonoBehaviour
         Camera cam = Camera.main;
         List<ChatBubbleInfo> bubbleInfos = new List<ChatBubbleInfo>();
 
-        // First, build a list of bubbles with their “desired” screen positions.
+        // Build a list of bubbles with their “desired” screen positions.
         foreach (KeyValuePair<Transform, ChatBubble> kvp in _chatBubbles)
         {
             ChatBubble bubble = kvp.Value;
             if (bubble.Source == null)
                 continue;
 
-            // Each bubble “wants” to appear at its target position plus a vertical offset.
+            // The bubble is normally anchored above its source.
             Vector3 desiredWorldPos = bubble.Source.position + Vector3.up * bubble.VerticalOffset;
             Vector3 screenPos = cam.WorldToScreenPoint(desiredWorldPos);
+
+            // If the camera is nearly top–down, adjust the screen position upward by a fixed offset
+            // so the bubble does not cover the character’s head.
+            // (We check the dot product between the camera's forward and the negative world up.)
+            if (Vector3.Dot(cam.transform.forward, -Vector3.up) > 0.5f)
+            {
+                screenPos.y += headScreenOffset;
+            }
+
             // Get the size of the bubble in screen space.
             Vector2 screenSize = bubble.GetScreenSize();
             float depth = screenPos.z;
@@ -137,8 +150,8 @@ public class ChatBubbleManager : MonoBehaviour
                 if (rectA.Overlaps(rectB))
                 {
                     // Calculate how much rectB must be moved upward so that its bottom
-                    // is just above rectA.top.
-                    float pushAmount = (rectA.yMax - rectB.yMin) + 5f; // add a 5px margin
+                    // is just above rectA.top, plus a small margin.
+                    float pushAmount = (rectA.yMax - rectB.yMin) + 5f;
                     bubbleInfos[j].ScreenPos = new Vector3(
                         bubbleInfos[j].ScreenPos.x,
                         bubbleInfos[j].ScreenPos.y + pushAmount,
@@ -148,7 +161,8 @@ public class ChatBubbleManager : MonoBehaviour
             }
         }
 
-        // Finally, apply the (possibly adjusted) positions and ensure bubbles face the camera.
+        // Finally, convert the (possibly adjusted) screen positions back to world positions,
+        // and update the bubbles.
         foreach (ChatBubbleInfo info in bubbleInfos)
         {
             Vector3 adjustedWorldPos = cam.ScreenToWorldPoint(

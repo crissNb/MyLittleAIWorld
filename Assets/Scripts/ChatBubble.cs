@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -19,6 +20,9 @@ public class ChatBubble : MonoBehaviour
     // If you wish, assign _handleRenderer in the inspector; otherwise, we find it in Start.
     [SerializeField]
     private SpriteRenderer _handleRenderer;
+
+    [SerializeField]
+    private float _cornerRadius = 0.1f;
 
     private Transform _source;
 
@@ -120,24 +124,42 @@ public class ChatBubble : MonoBehaviour
     /// Updates the handle’s (pointer’s) position along the edge of the bubble.
     /// This calculation uses the bubble’s local space.
     /// </summary>
+
     private void UpdateHandlePosition()
     {
         if (_source == null)
             return;
 
-        // Compute direction from the bubble (in world space) to the target.
-        Vector3 toSourceWorld = _source.position - transform.position;
-        // Convert that direction into the bubble’s local space.
-        Vector3 toSourceLocal = transform.InverseTransformDirection(toSourceWorld.normalized);
-        Vector2 direction = new Vector2(toSourceLocal.x, toSourceLocal.y).normalized;
+        Camera cam = Camera.main;
+        if (cam == null)
+            return;
+
+        // Get screen positions of the bubble and the source
+        Vector3 bubbleScreenPos = cam.WorldToScreenPoint(transform.position);
+        Vector3 sourceScreenPos = cam.WorldToScreenPoint(_source.position);
+
+        // If source screen position is not visible, hide the bubble
+        if (sourceScreenPos.z < 0)
+        {
+            _handle.gameObject.SetActive(false);
+            return;
+        }
+        else
+        {
+            _handle.gameObject.SetActive(true);
+        }
+
+        // Compute direction in screen space
+        Vector2 direction = (sourceScreenPos - bubbleScreenPos).normalized;
+
         if (direction == Vector2.zero)
             return;
 
-        // Calculate the bubble’s half–dimensions in local space.
+        // Calculate the bubble’s half–dimensions in local space, adjusted for the handle's size
         float halfWidth = _bubbleRenderer.size.x / 2f + _handleRenderer.size.x / 2f;
         float halfHeight = _bubbleRenderer.size.y / 2f + _handleRenderer.size.y / 2f;
 
-        // Calculate the scale factor for intersection with the bubble’s bounds.
+        // Calculate intersection with the bubble's edge along this direction
         float tx =
             direction.x != 0
                 ? (direction.x > 0 ? halfWidth : -halfWidth) / direction.x
@@ -148,17 +170,34 @@ public class ChatBubble : MonoBehaviour
                 : Mathf.Infinity;
         float t = Mathf.Min(tx, ty);
 
-        // Position the handle at the intersection point.
         Vector2 edgePoint = direction * t;
-        _handle.localPosition = edgePoint;
 
-        // Set the handle’s rotation so that it “points” back to the target.
-        bool isHorizontal = Mathf.Abs(direction.x) > Mathf.Abs(direction.y);
+        // If the intersection point is on the vertical edges (left or right)
+        bool isVertical = tx < ty;
+
         float clampedAngle = 0f;
-        if (isHorizontal)
+        if (isVertical)
+        {
             clampedAngle = direction.x > 0 ? 90f : -90f;
+
+            // Adjust the edge point to the edge of the bubble
+            edgePoint.y = Mathf.Clamp(
+                edgePoint.y,
+                -halfHeight + _cornerRadius,
+                halfHeight - _cornerRadius
+            );
+        }
         else
+        {
             clampedAngle = direction.y > 0 ? 180f : 0f;
+            edgePoint.x = Mathf.Clamp(
+                edgePoint.x,
+                -halfWidth + _cornerRadius,
+                halfWidth - _cornerRadius
+            );
+        }
+
+        _handle.localPosition = edgePoint;
         _handle.localRotation = Quaternion.Euler(0, 0, clampedAngle);
     }
 }

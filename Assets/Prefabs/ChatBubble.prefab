@@ -370,5 +370,4 @@ MonoBehaviour:
   padding: {x: 0.2, y: 0.2}
   _bubbleRenderer: {fileID: 675952948947395885}
   _handleRenderer: {fileID: 2182685610265692251}
-  test: 0
-  testTransform: {fileID: 0}
+  _cornerRadius: 0.2

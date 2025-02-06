@@ -118,7 +118,7 @@ public class ChatBubbleManager : MonoBehaviour
             return;
 
         Camera cam = Camera.main;
-        List<ChatBubbleInfo> bubbleInfos = new List<ChatBubbleInfo>();
+        List<ChatBubbleInfo> bubbleInfos = new();
 
         // Build a list of bubbles with their “desired” screen positions.
         foreach (KeyValuePair<Transform, ChatBubble> kvp in _chatBubbles)

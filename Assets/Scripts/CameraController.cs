@@ -3,40 +3,69 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     [Header("Camera Settings")]
-    [SerializeField] private float _panSpeed = 30f;
-    [SerializeField] private float _zoomSpeed = 20f;
-    [SerializeField] private float _smoothSpeed = 10f;
-    [SerializeField] private float _edgeScrollThreshold = 20f;
-    
+    [SerializeField]
+    private float _panSpeed = 30f;
+
+    [SerializeField]
+    private float _zoomSpeed = 20f;
+
+    [SerializeField]
+    private float _smoothSpeed = 10f;
+
+    [SerializeField]
+    private float _edgeScrollThreshold = 20f;
+
     [Header("Boundaries")]
-    [SerializeField] private float _minX = -50f;
-    [SerializeField] private float _maxX = 50f;
-    [SerializeField] private float _minZ = -50f;
-    [SerializeField] private float _maxZ = 50f;
-    
+    [SerializeField]
+    private float _minX = -50f;
+
+    [SerializeField]
+    private float _maxX = 50f;
+
+    [SerializeField]
+    private float _minZ = -50f;
+
+    [SerializeField]
+    private float _maxZ = 50f;
+
     [Header("Distance Settings")]
-    [SerializeField] private float _minDistance = 1f;
-    [SerializeField] private float _maxDistance = 6f;
-    [SerializeField] private float _defaultDistance = 4f;
-    
+    [SerializeField]
+    private float _minDistance = 1f;
+
+    [SerializeField]
+    private float _maxDistance = 6f;
+
+    [SerializeField]
+    private float _defaultDistance = 4f;
+
     [Header("Behind Mode Rotation Settings")]
     // When at the default offset distance, the camera pitch is 68°.
     // When zoomed all the way in (_minDistance), the camera pitch should be 20°.
-    [SerializeField] private float _behindPitch = 68f;    // Pitch at default offset.
-    [SerializeField] private float _minBehindPitch = 20f; // Pitch at minimum distance.
+    [SerializeField]
+    private float _behindPitch = 68f; // Pitch at default offset.
+
+    [SerializeField]
+    private float _minBehindPitch = 20f; // Pitch at minimum distance.
+
     // Use a fixed yaw so that the camera does not snap to the player's rotation.
-    [SerializeField] private float _behindYaw = 0f;
-    
+    [SerializeField]
+    private float _behindYaw = 0f;
+
     [Header("Top-Down Mode Rotation Settings")]
-    [SerializeField] private float _topDownPitch = 90f;
-    [SerializeField] private float _topDownYaw = 0f;
-    
+    [SerializeField]
+    private float _topDownPitch = 90f;
+
+    [SerializeField]
+    private float _topDownYaw = 0f;
+
     [Header("Target Settings")]
-    [SerializeField] private Transform _playerBody;
-    
+    [SerializeField]
+    private Transform _playerBody;
+
     // The pivot around which the camera orbits.
     // It starts centered on the player but can be panned, and reset with Space.
     private Vector3 _targetPosition;
+
     // The current camera distance (modified via mouse scroll).
     private float _currentDistance;
 
@@ -71,10 +100,14 @@ public class CameraController : MonoBehaviour
     {
         Vector3 moveDirection = Vector3.zero;
         Vector2 mousePosition = Input.mousePosition;
-        if (mousePosition.x < _edgeScrollThreshold) moveDirection.x = -1;
-        if (mousePosition.x > Screen.width - _edgeScrollThreshold) moveDirection.x = 1;
-        if (mousePosition.y < _edgeScrollThreshold) moveDirection.z = -1;
-        if (mousePosition.y > Screen.height - _edgeScrollThreshold) moveDirection.z = 1;
+        if (mousePosition.x < _edgeScrollThreshold)
+            moveDirection.x = -1;
+        if (mousePosition.x > Screen.width - _edgeScrollThreshold)
+            moveDirection.x = 1;
+        if (mousePosition.y < _edgeScrollThreshold)
+            moveDirection.z = -1;
+        if (mousePosition.y > Screen.height - _edgeScrollThreshold)
+            moveDirection.z = 1;
 
         // Also support WASD (or arrow keys via Horizontal/Vertical axes).
         moveDirection.x += Input.GetAxis("Horizontal");
@@ -91,7 +124,11 @@ public class CameraController : MonoBehaviour
         if (scroll != 0)
         {
             // Update the current distance and clamp it.
-            _currentDistance = Mathf.Clamp(_currentDistance - scroll * _zoomSpeed, _minDistance, _maxDistance);
+            _currentDistance = Mathf.Clamp(
+                _currentDistance - scroll * _zoomSpeed,
+                _minDistance,
+                _maxDistance
+            );
             // Note: We no longer auto–recenter when zooming in.
         }
     }
@@ -124,15 +161,16 @@ public class CameraController : MonoBehaviour
         Quaternion behindRotation = Quaternion.Euler(currentBehindPitch, _behindYaw, 0f);
         // Compute the behind position by moving backwards from the pivot along the rotated forward vector.
         Vector3 behindPosition = pivot - (behindRotation * Vector3.forward) * _currentDistance;
-        
+
         // --- Top–Down Mode Calculation ---
         Quaternion topRotation = Quaternion.Euler(_topDownPitch, _topDownYaw, 0f);
         Vector3 topPosition = pivot + Vector3.up * _currentDistance;
-        
+
         // --- Blend Between Modes ---
         // When at _defaultDistance, we're fully in behind mode.
         // As we zoom out past _defaultDistance, blend toward the top–down view.
-        float blendFactor = (_currentDistance - _defaultDistance) / (_maxDistance - _defaultDistance);
+        float blendFactor =
+            (_currentDistance - _defaultDistance) / (_maxDistance - _defaultDistance);
         blendFactor = Mathf.Clamp01(blendFactor);
 
         Quaternion finalRotation = Quaternion.Slerp(behindRotation, topRotation, blendFactor);
@@ -146,8 +184,16 @@ public class CameraController : MonoBehaviour
         }
         else
         {
-            transform.position = Vector3.Lerp(transform.position, finalPosition, Time.deltaTime * _smoothSpeed);
-            transform.rotation = Quaternion.Slerp(transform.rotation, finalRotation, Time.deltaTime * _smoothSpeed);
+            transform.position = Vector3.Lerp(
+                transform.position,
+                finalPosition,
+                Time.deltaTime * _smoothSpeed
+            );
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                finalRotation,
+                Time.deltaTime * _smoothSpeed
+            );
         }
     }
 }

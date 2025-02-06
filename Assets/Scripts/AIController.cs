@@ -36,6 +36,10 @@ public class AIController : MonoBehaviour
 
     private void Update()
     {
+        if (GetPersonality().Name == "Sebastian" || GetPersonality().Name == "Johny")
+        {
+            return;
+        }
         if (_aiState == AIState.AwaitResponse)
         {
             return;
@@ -78,8 +82,10 @@ public class AIController : MonoBehaviour
         return place + " not found";
     }
 
-    public string Talk(string targetPerson, string message)
+    public string Talk(LLMAction llmAction)
     {
+        string targetPerson = llmAction.target;
+        string message = llmAction.content;
         AIController targetAI = AIRepository.Instance.GetAIController(targetPerson);
 
         if (targetAI == null)
@@ -94,18 +100,18 @@ public class AIController : MonoBehaviour
         }
 
         // Talk to target
-        targetAI.ReceiveTalk(GetPersonality().Name, message);
+        targetAI.ReceiveTalk(llmAction);
 
         _aiState = AIState.Talking;
 
         return "";
     }
 
-    public void ReceiveTalk(string from, string message)
+    public void ReceiveTalk(LLMAction llmAction)
     {
         // Handle incoming message
         _aiState = AIState.Talking;
-        _aiInterpreter.SetOpponentAction(new OpponentAction(from, message));
+        _aiInterpreter.SetOpponentAction(new OpponentAction(llmAction.target, llmAction));
         _aiInterpreter.SendRequest();
     }
 

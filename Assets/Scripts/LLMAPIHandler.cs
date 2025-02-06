@@ -24,7 +24,11 @@ public class LLMAPIHandler : MonoBehaviour
     {
         GPT4o,
         Claude3_5Sonnet,
-        GPT4oMini
+        GPT4oMini,
+        DeepseekChat,
+        DeepseekR1,
+        Gemini2_0_Flash_Thinking,
+        Qwen_2_5_72b
     }
 
     [System.Serializable]
@@ -142,6 +146,10 @@ public class LLMAPIHandler : MonoBehaviour
             ChatModel.GPT4o => "gpt-4o",
             ChatModel.Claude3_5Sonnet => "claude-3.5-sonnet",
             ChatModel.GPT4oMini => "gpt-4o-mini",
+            ChatModel.DeepseekChat => "deepseek-chat",
+            ChatModel.DeepseekR1 => "deepseek-r1",
+            ChatModel.Gemini2_0_Flash_Thinking => "gemini-2.0-flash-thinking",
+            ChatModel.Qwen_2_5_72b => "qwen-2.5-72b",
             _ => "gpt-4o" // default
         };
     }

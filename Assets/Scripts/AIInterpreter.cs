@@ -30,14 +30,6 @@ public class AIInterpreter : MonoBehaviour
         get { return _personality; }
     }
 
-    [System.Serializable]
-    private class LLMAction
-    {
-        public string action;
-        public string target;
-        public string content;
-    }
-
     private void Start()
     {
         _relationships = new Dictionary<string, string>();
@@ -114,7 +106,7 @@ public class AIInterpreter : MonoBehaviour
             string result = "";
             result = action.action.ToLower() switch
             {
-                "talk" => _aiController.Talk(param, content),
+                "talk" => _aiController.Talk(action),
                 "goto" => _aiController.GoTo(param),
                 _ => "Invalid action: " + action.action, // Invalid action, request new action
             };
@@ -150,12 +142,13 @@ public class AIInterpreter : MonoBehaviour
 
         if (_previousOpponentAction != null)
         {
+            string opponentActionJSON = JsonUtility.ToJson(_previousOpponentAction.action);
             prompt +=
                 _basePrompt.PreviousOpponentText
                 + _previousOpponentAction.from
                 + _basePrompt.PreviousActionOpponent
                 + "\n"
-                + _previousOpponentAction.actionDescription;
+                + opponentActionJSON;
         }
 
         if (!string.IsNullOrEmpty(failReason))
@@ -220,11 +213,19 @@ public class AIInterpreter : MonoBehaviour
 public class OpponentAction
 {
     public string from;
-    public string actionDescription;
+    public LLMAction action;
 
-    public OpponentAction(string from, string actionDescription)
+    public OpponentAction(string from, LLMAction action)
     {
         this.from = from;
-        this.actionDescription = actionDescription;
+        this.action = action;
     }
+}
+
+[System.Serializable]
+public class LLMAction
+{
+    public string action;
+    public string target;
+    public string content;
 }
